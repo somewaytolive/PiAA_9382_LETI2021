@@ -1,13 +1,12 @@
-
 #include <iostream>
 #include <vector>
 #include <ctime>
 
 // промежуточный вывод
-//7#define OUTPUT
+#define OUTPUT
 
 // подсчет операций
-//#define COUNTOPERATIONS
+#define COUNTOPERATIONS
 
 #ifdef COUNTOPERATIONS
 int countOfOperations = 0;
@@ -21,11 +20,11 @@ public:
     int size;
 };
 
-bool tryAbilityToAddSquare(std::vector<std::vector<int>>& mainSquare, int x, int y, int sizeOfSmallSqr)
+bool tryAbilityToAddSquare(std::vector<std::vector<int>>& mainSquare, int x, int y, int sizeOfSmallSqr) 
 {
-#ifdef COUNTOPERATIONS
+    #ifdef COUNTOPERATIONS
     ++countOfOperations;
-#endif
+    #endif
 
     // базовая проверка на адекватность
     if ((x + sizeOfSmallSqr) > mainSquare.size() || (y + sizeOfSmallSqr) > mainSquare.size())
@@ -33,9 +32,9 @@ bool tryAbilityToAddSquare(std::vector<std::vector<int>>& mainSquare, int x, int
         return false;
     }
 
-    for (int i = y; i < y + sizeOfSmallSqr; i++)
+    for (int i = y; i < y + sizeOfSmallSqr; i++) 
     {
-        for (int j = x; j < x + sizeOfSmallSqr; j++)
+        for (int j = x; j < x + sizeOfSmallSqr; j++) 
         {
             if (mainSquare[i][j])
             {
@@ -48,23 +47,23 @@ bool tryAbilityToAddSquare(std::vector<std::vector<int>>& mainSquare, int x, int
 
 void addSmallSqrToMainSqr(std::vector<std::vector<int>>& mainSquare, int x, int y, int sizeOfSmallSqr)
 {
-#ifdef COUNTOPERATIONS
+    #ifdef COUNTOPERATIONS
     ++countOfOperations;
-#endif
+    #endif
 
     // просто закрашиваем указанные клетки без проверки
-    for (int i = y; i < y + sizeOfSmallSqr; i++)
+    for (int i = y; i < y + sizeOfSmallSqr; i++) 
     {
-        for (int j = x; j < x + sizeOfSmallSqr; j++)
+        for (int j = x; j < x + sizeOfSmallSqr; j++) 
         {
             mainSquare[i][j] = sizeOfSmallSqr;
         }
     }
 }
 
-void printMainSquare(std::vector <std::vector <int>>& mainSquare, int compr, int sizeOfMainSquare)
+void printMainSquare(std::vector <std::vector <int>>& mainSquare, int compr, int sizeOfMainSquare) 
 {
-    for (int i = 0; i < sizeOfMainSquare * compr; i++)
+    for (int i = 0; i < sizeOfMainSquare * compr; i++) 
     {
         for (int j = 0; j < sizeOfMainSquare * compr; j++) // просто печатаем все клетки по порядку
         {
@@ -77,72 +76,72 @@ void printMainSquare(std::vector <std::vector <int>>& mainSquare, int compr, int
 
 void initMainSqrWithZeros(std::vector<std::vector<int>>& mainSquare, int sizeOfMainSquare) // заполнен нулями == не поставлено ни одного квадрата
 {
-#ifdef COUNTOPERATIONS
+    #ifdef COUNTOPERATIONS
     ++countOfOperations;
-#endif
+    #endif
 
     // просто заполняем все нулями
     mainSquare.resize(sizeOfMainSquare);
-    for (int i = 0; i < sizeOfMainSquare; i++)
+    for (int i = 0; i < sizeOfMainSquare; i++) 
     {
         mainSquare[i].resize(sizeOfMainSquare);
 
-        for (int j = 0; j < sizeOfMainSquare; j++)
+        for (int j = 0; j < sizeOfMainSquare; j++) 
         {
             mainSquare[i][j] = 0;
         }
     }
 }
 
-void deleteLastSmallSqr(std::vector<std::vector<int>>& mainSquare, std::vector<SmallSquare>& currArrayOfSmallSqrs, int recursionDepth)
+void deleteLastSmallSqr(std::vector<std::vector<int>>& mainSquare, std::vector<SmallSquare>& currArrayOfSmallSqrs, int recursionDepth) 
 {
-#ifdef COUNTOPERATIONS
+    #ifdef COUNTOPERATIONS
     ++countOfOperations;
-#endif
+    #endif
 
-    SmallSquare lastSqr = currArrayOfSmallSqrs.back();
+    SmallSquare lastSqr = currArrayOfSmallSqrs.back(); 
     // очистка из массива
     currArrayOfSmallSqrs.pop_back();
 
     // очистка из основного квадрата
-    for (int i = lastSqr.y; i < lastSqr.y + lastSqr.size; i++)
+    for (int i = lastSqr.y; i < lastSqr.y + lastSqr.size; i++) 
     {
-        for (int j = lastSqr.x; j < lastSqr.x + lastSqr.size; j++)
+        for (int j = lastSqr.x; j < lastSqr.x + lastSqr.size; j++) 
         {
             mainSquare[i][j] = 0;
         }
     }
 
-#ifdef OUTPUT
+    #ifdef OUTPUT
     for(int l = 0; l < recursionDepth; l++)
     {
         std::cout << " ";
     }
     std::cout << "Удаляем квадрат (l = " << lastSqr.size << ", x = " <<  lastSqr.x + 1 << ", y = " << lastSqr.y + 1 << ')' << std::endl;
-#endif
+    #endif
 }
 
 
-void preworkWithMainSqr(int &compr, std::vector<std::vector<int>>& mainSquare, std::vector<SmallSquare>& currArrayOfSmallSqrs, int& freeAreaOfMainSquare, int& sizeOfMainSquare, int& bestCountOfSquares)
+void preworkWithMainSqr(int &compr, std::vector<std::vector<int>>& mainSquare, std::vector<SmallSquare>& currArrayOfSmallSqrs, int& freeAreaOfMainSquare, int& sizeOfMainSquare, int& bestCountOfSquares) 
 {
-#ifdef COUNTOPERATIONS
+    #ifdef COUNTOPERATIONS
     ++countOfOperations;
-#endif
+    #endif
 
     initMainSqrWithZeros(mainSquare, sizeOfMainSquare); // инициализация пустого "видимого" квадрата
 
     // оптимизации для простейших кратностей
-    if (sizeOfMainSquare % 2 == 0)
+    if (sizeOfMainSquare % 2 == 0) 
     {
         compr = sizeOfMainSquare / 2;
         sizeOfMainSquare = 2;
     }
-    else if (sizeOfMainSquare % 3 == 0)
+    else if (sizeOfMainSquare % 3 == 0) 
     {
         compr = sizeOfMainSquare / 3;
         sizeOfMainSquare = 3;
     }
-    else if (sizeOfMainSquare % 5 == 0)
+    else if (sizeOfMainSquare % 5 == 0) 
     {
         compr = sizeOfMainSquare / 5;
         sizeOfMainSquare = 5;
@@ -161,38 +160,38 @@ void preworkWithMainSqr(int &compr, std::vector<std::vector<int>>& mainSquare, s
     addSmallSqrToMainSqr(mainSquare, 0, (sizeOfMainSquare + 1) / 2, sizeOfMainSquare / 2);
     addSmallSqrToMainSqr(mainSquare, (sizeOfMainSquare + 1) / 2, 0, sizeOfMainSquare / 2);
 
-#ifdef OUTPUT
+    #ifdef OUTPUT
     std::cout << "Вставляем квадрат (l = " << (sizeOfMainSquare + 1) / 2 << ", x = " <<  1 << ", y = " << 1 << ")" << std::endl;
     std::cout << "Вставляем квадрат (l = " << sizeOfMainSquare / 2 << ", x = " <<  1 << ", y = " << (sizeOfMainSquare + 1) / 2 + 1 << ")" << std::endl;
     std::cout << "Вставляем квадрат (l = " << sizeOfMainSquare / 2 << ", x = " <<  (sizeOfMainSquare + 1) / 2 + 1 << ", y = " << 1 << ")" << std::endl;
-#endif
+    #endif
 
     // обновление к-ва пустого пространства
     freeAreaOfMainSquare = sizeOfMainSquare * sizeOfMainSquare - ((sizeOfMainSquare + 1) / 2) * ((sizeOfMainSquare + 1) / 2) - 2 * (sizeOfMainSquare / 2) * (sizeOfMainSquare / 2);
 }
 
-void doTaskRecursive(std::vector<std::vector<int>>& mainSquare, int freeAreaOfMainSquare, int sizeOfSmallSqr, int currCountOfSmallSqrs, std::vector<SmallSquare>& currArrayOfSmallSqrs, int recursionDepth, int sizeOfMainSquare, int& bestCountOfSquares, std::vector<SmallSquare>& bestArrayOfSmallSqrs)
+void doTaskRecursive(std::vector<std::vector<int>>& mainSquare, int freeAreaOfMainSquare, int sizeOfSmallSqr, int currCountOfSmallSqrs, std::vector<SmallSquare>& currArrayOfSmallSqrs, int recursionDepth, int sizeOfMainSquare, int& bestCountOfSquares, std::vector<SmallSquare>& bestArrayOfSmallSqrs) 
 {
-#ifdef COUNTOPERATIONS
+    #ifdef COUNTOPERATIONS
     ++countOfOperations;
-#endif
+    #endif
 
     // даже если квадрат заполнит все пустоты - результат будет не лучше нынешнего
-    if ( (currCountOfSmallSqrs == (bestCountOfSquares - 1)) && (freeAreaOfMainSquare) )
+    if ( (currCountOfSmallSqrs == (bestCountOfSquares - 1)) && (freeAreaOfMainSquare) ) 
     {
-#ifdef OUTPUT
+        #ifdef OUTPUT
         for(int l = 0; l < recursionDepth; l++)
         {
             std::cout << " ";
         }
         std::cout << "Количество квадратов не меньше лучшего, выход из рекурсии" << std::endl;
-#endif
+        #endif
 
         return;
     }
 
     // первый добавленный квадрат (после начальных 3)
-    if ( ((sizeOfSmallSqr + 1) <= (sizeOfMainSquare / 2)) && (currCountOfSmallSqrs == 3) )
+    if ( ((sizeOfSmallSqr + 1) <= (sizeOfMainSquare / 2)) && (currCountOfSmallSqrs == 3) ) 
     {
         // рекурсивный вызов этой же функции
         doTaskRecursive(mainSquare, freeAreaOfMainSquare, (sizeOfSmallSqr+1), currArrayOfSmallSqrs.size(), currArrayOfSmallSqrs, 0, sizeOfMainSquare, bestCountOfSquares, bestArrayOfSmallSqrs);
@@ -200,12 +199,12 @@ void doTaskRecursive(std::vector<std::vector<int>>& mainSquare, int freeAreaOfMa
 
 
     bool ableToAddSmallSqr = false;
-    for (int y = 0; y < sizeOfMainSquare; y++)
+    for (int y = 0; y < sizeOfMainSquare; y++) 
     {
-        for (int x = 0; x < sizeOfMainSquare; x++)
+        for (int x = 0; x < sizeOfMainSquare; x++) 
         {
             // для каждой пустой клетки происходит попытка вставить квадрат текущего размера
-            if (mainSquare[y][x] == 0)
+            if (mainSquare[y][x] == 0) 
             {
                 if (tryAbilityToAddSquare(mainSquare, x, y, sizeOfSmallSqr))
                 {
@@ -214,83 +213,83 @@ void doTaskRecursive(std::vector<std::vector<int>>& mainSquare, int freeAreaOfMa
                     freeAreaOfMainSquare -= sizeOfSmallSqr * sizeOfSmallSqr;
                     currArrayOfSmallSqrs.push_back({ x, y, sizeOfSmallSqr });
 
-#ifdef OUTPUT
+                    #ifdef OUTPUT
                     for(int l=0; l < recursionDepth; l++)
                     {
                         std::cout << " ";
                     }
                     std::cout << "Вставляем квадрат (l = " << sizeOfSmallSqr<< ", x = " <<  x + 1 << ", y = " << y + 1 << ")" << std::endl;
-#endif
+                    #endif
 
                     break;
                 }
                 else
                 {
-#ifdef OUTPUT
+                    #ifdef OUTPUT
                     for(int l=0; l < recursionDepth; l++)
                     {
                         std::cout << " ";
                     }
                     std::cout << "Не можем поставить квадрат (l = " << sizeOfSmallSqr<< ", x = " <<  x + 1 << ", y = " << y + 1 << ")" << std::endl;
-#endif
+                    #endif
 
                     return;
                 }
             }
-            else
+            else 
             {
                 x += (mainSquare[y][x] - 1);
             }
         }
 
         // выход из цикла
-        if(ableToAddSmallSqr)
+        if(ableToAddSmallSqr) 
         {
             break;
         }
     }
 
     // нет смысла обновлять показатели лучшего результата при таком же количестве обрезков
-    if ( (currCountOfSmallSqrs + 1) == bestCountOfSquares)
+    if ( (currCountOfSmallSqrs + 1) == bestCountOfSquares) 
     {
-#ifdef OUTPUT
+        #ifdef OUTPUT
         for(int l = 0; l < recursionDepth; l++)
         {
             std::cout << " ";
         }
         std::cout << "Количество квадратов не меньше лучшего, выход из рекурсии" << '\n';
-#endif
+        #endif
 
         deleteLastSmallSqr(mainSquare, currArrayOfSmallSqrs, recursionDepth);
         return;
     }
 
     // минимальное заполнение
-    if ( ((currCountOfSmallSqrs + 1) < bestCountOfSquares) && (freeAreaOfMainSquare == 0))
+    if ( ((currCountOfSmallSqrs + 1) < bestCountOfSquares) && (freeAreaOfMainSquare == 0)) 
     {
         bestCountOfSquares = currCountOfSmallSqrs + 1;
         bestArrayOfSmallSqrs.assign(currArrayOfSmallSqrs.begin(), currArrayOfSmallSqrs.end());
 
-#ifdef OUTPUT
+        #ifdef OUTPUT
         std::cout << "!!!Нашли новое лучшее количество квадратов: " << bestCountOfSquares << std::endl;
-#endif
+        #endif
 
         deleteLastSmallSqr(mainSquare, currArrayOfSmallSqrs, recursionDepth);
         return;
     }
 
     // рекурсивный вызов этой же функции
-    for (int i = sizeOfMainSquare / 2; i > 0; i--)
+    for (int i = sizeOfMainSquare / 2; i > 0; i--) 
     {
-        if (i * i <= freeAreaOfMainSquare)
+        if (i * i <= freeAreaOfMainSquare) 
         {
-#ifdef OUTPUT
+            #ifdef OUTPUT
             for (int l=0; l < recursionDepth+2; l++)
             {
                 std::cout << " ";
             }
             std::cout << "Вызываем рекурсию для квадрата со стороной " << i << '\n';
-#endif
+            #endif
 
             doTaskRecursive(mainSquare, freeAreaOfMainSquare, i, currCountOfSmallSqrs + 1, currArrayOfSmallSqrs, recursionDepth+2, sizeOfMainSquare, bestCountOfSquares, bestArrayOfSmallSqrs);
         }
@@ -299,7 +298,7 @@ void doTaskRecursive(std::vector<std::vector<int>>& mainSquare, int freeAreaOfMa
     deleteLastSmallSqr(mainSquare, currArrayOfSmallSqrs, recursionDepth);
 }
 
-int main()
+int main() 
 {
     setlocale(LC_ALL, "Russian");
 
@@ -312,45 +311,45 @@ int main()
     int sizeOfMainSquare;
     int bestCountOfSquares; // лучшее количество маленьких квадратов, покрывающих основной
 
-#ifdef OUTPUT
+    #ifdef OUTPUT
     std::cout << "Введите размер главного квадрата:" << std::endl;
-#endif
+    #endif
     std::cin >> sizeOfMainSquare;
 
 
     preworkWithMainSqr(compr, mainSquare, currArrayOfSmallSqrs, freeAreaOfMainSquare, sizeOfMainSquare, bestCountOfSquares);
 
-#ifdef OUTPUT
+    #ifdef OUTPUT
     clock_t start = clock();
-#endif
+    #endif
 
     doTaskRecursive(mainSquare, freeAreaOfMainSquare, 1, currArrayOfSmallSqrs.size(), currArrayOfSmallSqrs, 0, sizeOfMainSquare, bestCountOfSquares, bestArrayOfSmallSqrs);
 
-#ifdef OUTPUT
+    #ifdef OUTPUT
     clock_t end = clock();
 
     std::cout << "\nВремя выполнения: " << (double) (end - start) / CLOCKS_PER_SEC << "\n\n";
-#endif
+    #endif
 
-#ifdef COUNTOPERATIONS
+    #ifdef COUNTOPERATIONS
     std::cout << "Количество операций = " << ::countOfOperations << '\n' << std::endl;
-#endif
-
+    #endif
+    
     std::cout << bestCountOfSquares << std::endl;
-
+    
     for (int i = 0; i < bestArrayOfSmallSqrs.size(); i++)
     {
         std::cout << bestArrayOfSmallSqrs[i].x * compr + 1 << " " << bestArrayOfSmallSqrs[i].y * compr + 1 << " " << bestArrayOfSmallSqrs[i].size * compr << std::endl;
 
-#ifdef OUTPUT
+        #ifdef OUTPUT
         addSmallSqrToMainSqr(mainSquare, bestArrayOfSmallSqrs[i].x * compr, bestArrayOfSmallSqrs[i].y * compr, bestArrayOfSmallSqrs[i].size * compr);
-#endif
+        #endif
     }
 
-#ifdef OUTPUT
+    #ifdef OUTPUT
     std::cout << std::endl;
     printMainSquare(mainSquare, compr, sizeOfMainSquare);
-#endif
+    #endif
 
     return 0;
 }
