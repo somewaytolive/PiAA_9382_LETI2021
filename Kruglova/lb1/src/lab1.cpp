@@ -20,7 +20,7 @@ public:
     int size;
 };
 
-bool tryAbilityToAddSquare(std::vector<std::vector<int>>& mainSquare, int x, int y, int sizeOfSmallSqr) 
+bool tryAbilityToAddSquare(const std::vector<std::vector<int>>& mainSquare, int x, int y, int sizeOfSmallSqr) 
 {
     #ifdef COUNTOPERATIONS
     ++countOfOperations;
@@ -61,7 +61,7 @@ void addSmallSqrToMainSqr(std::vector<std::vector<int>>& mainSquare, int x, int 
     }
 }
 
-void printMainSquare(std::vector <std::vector <int>>& mainSquare, int compr, int sizeOfMainSquare) 
+const void printMainSquare(const std::vector <std::vector <int>>& mainSquare, int compr, int sizeOfMainSquare) 
 {
     for (int i = 0; i < sizeOfMainSquare * compr; i++) 
     {
@@ -75,6 +75,7 @@ void printMainSquare(std::vector <std::vector <int>>& mainSquare, int compr, int
 }
 
 void initMainSqrWithZeros(std::vector<std::vector<int>>& mainSquare, int sizeOfMainSquare) // заполнен нулями == не поставлено ни одного квадрата
+// здесь ссылку константной сделать не можем, т.к. в 85 и 88 строках делается resize
 {
     #ifdef COUNTOPERATIONS
     ++countOfOperations;
@@ -177,7 +178,7 @@ void doTaskRecursive(std::vector<std::vector<int>>& mainSquare, int freeAreaOfMa
     #endif
 
     // даже если квадрат заполнит все пустоты - результат будет не лучше нынешнего
-    if ( (currCountOfSmallSqrs == (bestCountOfSquares - 1)) && (freeAreaOfMainSquare) ) 
+    if ( currCountOfSmallSqrs == (bestCountOfSquares - 1) && freeAreaOfMainSquare ) 
     {
         #ifdef OUTPUT
         for(int l = 0; l < recursionDepth; l++)
@@ -191,7 +192,7 @@ void doTaskRecursive(std::vector<std::vector<int>>& mainSquare, int freeAreaOfMa
     }
 
     // первый добавленный квадрат (после начальных 3)
-    if ( ((sizeOfSmallSqr + 1) <= (sizeOfMainSquare / 2)) && (currCountOfSmallSqrs == 3) ) 
+    if ( (sizeOfSmallSqr + 1) <= (sizeOfMainSquare / 2) && currCountOfSmallSqrs == 3 ) 
     {
         // рекурсивный вызов этой же функции
         doTaskRecursive(mainSquare, freeAreaOfMainSquare, (sizeOfSmallSqr+1), currArrayOfSmallSqrs.size(), currArrayOfSmallSqrs, 0, sizeOfMainSquare, bestCountOfSquares, bestArrayOfSmallSqrs);
@@ -250,7 +251,7 @@ void doTaskRecursive(std::vector<std::vector<int>>& mainSquare, int freeAreaOfMa
     }
 
     // нет смысла обновлять показатели лучшего результата при таком же количестве обрезков
-    if ( (currCountOfSmallSqrs + 1) == bestCountOfSquares) 
+    if ( currCountOfSmallSqrs + 1 == bestCountOfSquares) 
     {
         #ifdef OUTPUT
         for(int l = 0; l < recursionDepth; l++)
