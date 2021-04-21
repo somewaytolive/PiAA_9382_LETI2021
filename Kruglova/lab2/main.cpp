@@ -154,7 +154,7 @@ void print_stack(std::stack<char> res)
 
 int Graph::heuristic(char curr)
 {
-    return abs(curr - end);
+    return abs(end - curr);
 }
 
 char minF(list <char> open, map <char, float> F){//поиск минимального значения f(x)
@@ -228,8 +228,8 @@ std::stack<char> Graph::aStar()
 
         for (auto neighbor : point[curr])
         {
-            if (inList(close, neighbor.name)) //если уже проходили, дальшше
-                continue;
+            // if (inList(close, neighbor.name)) //если уже проходили, дальшше
+            //     continue;
             
             float tmpG = G[curr] + neighbor.weight; //вычисление g(x) для обрабатываемого соседа
 
