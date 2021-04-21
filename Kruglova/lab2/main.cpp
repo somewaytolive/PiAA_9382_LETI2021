@@ -100,11 +100,13 @@ std::stack<char> Graph::greedySearch()
         char tmp;
         if (!curr.empty())
         {
+            cout << "Looking for the next unvisited vertex" << endl;
             for (auto &var : point[res.top()]) //point[res.top()] == curr. Сделано для того, чтобы флаг изменялся
             // Ищем следующую непосещённую вершину
             {
                 if (!var.flag)
                 {
+                    cout << "Unvisited vertex found: " << var.name << endl;
                     can_go = true;
                     var.flag = true;
                     tmp = var.name;
@@ -115,9 +117,11 @@ std::stack<char> Graph::greedySearch()
 
         if (can_go)
         {
+            cout << "Go to the vertex '" << tmp << "'" << endl;
             res.push(tmp);
             curr = point[tmp];
         } else {
+            cout << "No way. Back" << endl;
             res.pop();
             if (!res.empty()) curr = point[res.top()];
         }
@@ -215,7 +219,9 @@ std::stack<char> Graph::aStar()
         cout << endl << "Open list: ";
         for (auto var : open)
             cout << var << " ";
-        cout << endl << "***Info end***" << endl;
+        cout << endl << "Priority list(vertex name - value): " << endl;
+        for (auto var : F)
+            cout << var.first << " - " << var.second << endl;
 
         if (curr == end)
         {
@@ -271,6 +277,8 @@ std::stack<char> Graph::dijkstra()
     list<char> open; //список рассматриваемых вершин
     map<char, char> from; //карта пути
     map <char, float> G; //хранит стоимости путей от начальной вершины
+
+    //начальная инициализация. Здесь заполняем веса для соседних вершин,
     G[start] = 0;
     for (auto var : point) {
         for (auto var2 : var.second)
@@ -282,6 +290,7 @@ std::stack<char> Graph::dijkstra()
     }
     open.remove(start);
 
+    //для всех остальных устанавливаем их равными INF
     for (auto var : point[start])
     {
         G[var.name] = var.weight;
@@ -303,8 +312,10 @@ std::stack<char> Graph::dijkstra()
         cout << "to " << var.first << " from " << var.second << endl;
     cout << "Initialization complete" << endl;
 
+    //пока список открытых вершин не пуст
     while (!open.empty())
     {
+        //ищем соседа с минимальной ценой
         char curr = find_min_vertex(open, G);
         cout << "Current vertex - " << curr << endl;
 
@@ -319,6 +330,7 @@ std::stack<char> Graph::dijkstra()
             cout << var << " ";
         cout << endl;
 
+        //для соседей пересчитываем веса
         for (auto var : point[curr])
         {
             if (G[curr]+var.weight < G[var.name])
@@ -337,6 +349,7 @@ std::stack<char> Graph::dijkstra()
 
     cout << "The algorithm has finished its work. Reconstruction path.." << endl;
 
+    //восстанавливаем путь
     return reconstruction(from);
 }
 
