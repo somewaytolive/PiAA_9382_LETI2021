@@ -79,18 +79,28 @@ void Graph::print_graph()
 
 char Graph::max_neighbors_flow(map<char, pair<int, int>> n_mas, string n_list)
 // Ищем соседнюю вершину с максимальным возможным потоком
-// Возвращает либо вершину, либо '-', если поток везде нуль
 {
     char max = n_list[0]; //первый элемент в мапе
     for (auto var : n_list)
     {
-        if (n_mas[var].first > n_mas[max].first)
+        if (n_mas[var].first - n_mas[var].second > n_mas[max].first - n_mas[max].second)
         {
             max = var;
         }
-        //cout << "one : " << n_mas[var].first << " two: " << n_mas[max].first << endl;
+        cout << "Neighbor name " << var << " - max flow: " << n_mas[var].first << 
+                " curr flow: " << n_mas[var].second << endl;
     }
     return max;
+    // char max = n_list[0]; //первый элемент в мапе
+    // for (auto var : n_list)
+    // {
+    //     if (var > max)
+    //     {
+    //         max = var;
+    //     }
+    //     //cout << "one : " << n_mas[var].first << " two: " << n_mas[max].first << endl;
+    // }
+    // return max;
 }
 
 int Graph::searchMaxFlow()
@@ -98,7 +108,7 @@ int Graph::searchMaxFlow()
     char curr = start;
     point[curr].markFlag = true; //метка у начальной вершины всегда активна, чтобы не выйти за пределы
     point[curr].mark.first = 99999;
-    string neighrors_list; //контейнер соседей
+    string neighbors_list; //контейнер соседей
     int sum = 0, flow;
 
     while (1)
@@ -107,11 +117,19 @@ int Graph::searchMaxFlow()
         //заполняем контейнер соседей
         {
             if (!point[var.first].markFlag && var.second.first != 0)
-                neighrors_list.push_back(var.first);
+                neighbors_list.push_back(var.first);
         }
-        //cout << neighrors_list << endl;
+        if (neighbors_list.empty())
+        {
+            cout << "Vertex '" << curr << "', neighbors - isEmpty!" << endl;
+        }
+        else 
+        {
+            cout << "Vertex '" << curr << "', neighbors - " << neighbors_list << endl;
+        }
+        //cout << neighbors_list << endl;
 
-        if (neighrors_list.empty())
+        if (neighbors_list.empty())
         {
             if (curr == start) 
             {
@@ -121,11 +139,12 @@ int Graph::searchMaxFlow()
                 continue;
             }
         }
-        char next = max_neighbors_flow(point[curr].neighbors, neighrors_list);
+        char next = max_neighbors_flow(point[curr].neighbors, neighbors_list);
+        cout << "Next vertex '" << next << "'" << endl;
 
         point[next].mark = {std::min(point[curr][next].first, point[curr].mark.first), curr};
         point[next].markFlag = true;
-        //cout << "next: " << next << "; mark[" << point[next].mark.first << "/" << point[next].mark.second << "]" << endl;
+        //cout << "Next vertex: " << next << "; mark[" << point[next].mark.first << "/" << point[next].neighbors[next] << "]" << endl;
         curr = next;
 
         if (curr == end)
@@ -152,7 +171,7 @@ int Graph::searchMaxFlow()
             }
             cout << ". Current flow: " << flow << endl;
         }
-        neighrors_list.clear();
+        neighbors_list.clear();
     }
 }
 
