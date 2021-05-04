@@ -1,188 +1,176 @@
 #include <iostream>
-#include <string>
-#include <map>
+#include <vector>
 #include <algorithm>
-#include <stack>
+#include <map>
+#include <string>
+#include <set>
+#include <climits>
 
-using std::map;
-using std::pair;
-using std::string;
-using std::cout;
-using std::cin;
-using std::endl;
-
-struct Node
-//структура хранит метку вершины и map соседних вершин и величину потока через ребро
+template <typename T>
+class Vertex
+//Хранит имя вершины, путь до нее и поток по этому пути
 {
-    bool markFlag;              //Активна ли метка
-    pair<int, char> mark;       //Какой поток пришел и откуда
-    map<char, pair<int, int>> neighbors;  //мапа вида вершина - {поток туда / поток обратно}
-    Node() : markFlag(false) {}
-    pair<int,int>& operator[](const char elem)
-    {
-        return neighbors[elem];
-    }
+public:
+    T name;
+    std::string path;
+    int flow_for_edge;
+    int flow_for_path = 0;
+    Vertex(T name_, std::string path_, int flow_f_e, int flow_f_p) 
+        : name(name_), path(path_), flow_for_edge(flow_f_e), flow_for_path(flow_f_p) {}
 };
 
+template <typename T>
 class Graph
 {
 private:
-    map<char, Node> point;
-    char start, end;
+    int size; //кол-во рёбер
+    T start;  //нач. вершина
+    T end;    //кон. вершниа
+    std::map<T, std::map<T, int>> const_edges; //Мапа рёбер (неизменяется, нужна для вывода)
+    std::map<T, std::map<T, int>> edges;       //Мапа рёбер, также хранит обратные рёбра (изменяется)
 public:
+    Graph() = default;
     void init();
-    void print_graph();
-    void print_for_stepik();
-    int searchMaxFlow();
-    char max_neighbors_flow(map<char, pair<int, int>>, string);
+    void print();
+    int ff_alg(); //Форд Фалкерсон
 };
 
-void Graph::print_for_stepik()
+template <typename T>
+void Graph<T>::init()
+//Читаем кол-во рёбер, старт, конец и заполняем мапу рёбер
 {
-    for (auto var : point)
+    T from, to;
+    int weight;
+    std::cin >> size;
+    std::cin >> start >> end;
+
+    for (int i=0; i<size; i++)
     {
-        for (auto var2 : var.second.neighbors)
-            cout << var.first << " " << var2.first << " " << var2.second.second << endl;
+        std::cin >> from >> to >> weight;
+        const_edges[from][to] = weight;
+        //Мапу для вывода заполняем всеми данными в тесте рёбрами
+
+        if (to == start || from == end) 
+        //В мапу для алгоритма кладём все рёбра, кроме ведущих в начало и исходящие из конца
+            continue;
+
+        if (edges[to].count(from) == 0)
+        {
+            edges[from][to] = 0;
+        }
+        if (edges[from].count(to) == 0)
+        {
+            edges[from][to] += weight;
+        } else {
+            edges[from][to] = weight;
+        }
     }
 }
 
-void Graph::init()
-/* Читаем start, end. После заполняем массив зависимостей */
+template <typename T>
+void Graph<T>::print()
 {
-    string input;
-    int n;
-    cin >> n;
-    //cout << "Enter start and end point: ";
-    cin >> start;
-    cin >> end;
-
-    char from, to;
-    int flow;
-    //cout << "Enter adjacency list:" << endl;
-    for (int i=0; i<n; i++)
+    for (const auto var : const_edges)
     {
-        cin >> from >> to >> flow;
-        point[from].neighbors[to].first = flow;
+        for (const auto var2 : var.second)
+        {
+            int f = const_edges[var.first][var2.first] - edges[var.first][var2.first];
+            if (f < 0) f = 0;
+            std::cout << var.first << " " << var2.first << " " << 
+                    f << std::endl;
+        }
     }
 }
 
-void Graph::print_graph()
+template <typename T>
+struct set_cmp
+//кмп для set'a сортируем сначала по потоку, потом по имени вершины
 {
-    for (auto var : point)
+    bool operator() (Vertex<T> a, Vertex<T> b)
     {
-        cout << var.first << ": ";
-        for (auto var2 : var.second.neighbors)
-            cout << var2.first << " " << var2.second.first << "/" << var2.second.second << "; ";
-        cout << std::endl;
+        if (a.flow_for_edge == b.flow_for_edge)
+            return a.name < b.name;
+        return a.flow_for_edge < b.flow_for_edge;
     }
-}
+};
 
-char Graph::max_neighbors_flow(map<char, pair<int, int>> n_mas, string n_list)
-// Ищем соседнюю вершину с максимальным возможным потоком
+template <typename T>
+int Graph<T>::ff_alg()
 {
-    char max = n_list[0]; //первый элемент в мапе
-    for (auto var : n_list)
+    int max_flow = 0; //макс поток
+    std::set<Vertex<T>, set_cmp<T>> open; //вершины, доступные для посещения
+        //Хранит имя вершины, путь до нее, поток по последнему ребру и мин. поток на пути
+    std::string close; //хранит имена закрытых вершин
+
+    open.insert(Vertex<T>(start, "", INT_MAX, INT_MAX));
+
+
+    while (!open.empty())
     {
-        if (n_mas[var].first - n_mas[var].second > n_mas[max].first - n_mas[max].second)
+        Vertex<T> curr = *(--open.end());
+        std::cout << "Open list:" << std::endl;
+        for (auto var : open)
         {
-            max = var;
+            std::cout << var.path << "->" << var.name << "; Flow for path = " << 
+                        var.flow_for_path << "; Flow for last edge = " << 
+                        var.flow_for_edge << ";" << std::endl; 
         }
-        cout << "Neighbor name " << var << " - max flow: " << n_mas[var].first << 
-                " curr flow: " << n_mas[var].second << endl;
-    }
-    return max;
-    // char max = n_list[0]; //первый элемент в мапе
-    // for (auto var : n_list)
-    // {
-    //     if (var > max)
-    //     {
-    //         max = var;
-    //     }
-    //     //cout << "one : " << n_mas[var].first << " two: " << n_mas[max].first << endl;
-    // }
-    // return max;
-}
+        std::cout << "Edge selected: " << curr.path << "->" << curr.name << " " << 
+                        "; Flow for path = " << curr.flow_for_path << 
+                        "; Flow for last edge = " << curr.flow_for_edge << 
+                        ";" << std::endl; 
+        open.erase(--open.end());
 
-int Graph::searchMaxFlow()
-{
-    char curr = start;
-    point[curr].markFlag = true; //метка у начальной вершины всегда активна, чтобы не выйти за пределы
-    point[curr].mark.first = 99999;
-    string neighbors_list; //контейнер соседей
-    int sum = 0, flow;
-
-    while (1)
-    {
-        for (auto var : point[curr].neighbors)
-        //заполняем контейнер соседей
+        if(curr.name == end)
+        // если пришли в конец
         {
-            if (!point[var.first].markFlag && var.second.first != 0)
-                neighbors_list.push_back(var.first);
-        }
-        if (neighbors_list.empty())
-        {
-            cout << "Vertex '" << curr << "', neighbors - isEmpty!" << endl;
-        }
-        else 
-        {
-            cout << "Vertex '" << curr << "', neighbors - " << neighbors_list << endl;
-        }
-        //cout << neighbors_list << endl;
-
-        if (neighbors_list.empty())
-        {
-            if (curr == start) 
+            curr.path += curr.name;
+            T from, to;
+            for (int i=0; i< curr.path.length() - 1; i++)
             {
-                return sum; //конец алгоритма
-            } else {
-                curr = point[curr].mark.second; //флаг оставляем активным, чтобы не заходить больше сюда
+                from = curr.path[i];
+                to = curr.path[i+1];
+                edges[from][to] -= curr.flow_for_path;
+                edges[to][from] += curr.flow_for_path;
+            }
+            max_flow += curr.flow_for_path;
+
+            std::cout << "Reached the end! Path: " << curr.path << "; Flow for path = " <<
+                        curr.flow_for_path << "; Summ flow for graph = " << max_flow << std::endl;
+
+            close.clear();
+            open.clear();
+            open.insert(Vertex<T>(start, "", INT_MAX, INT_MAX));
+            continue;
+        }
+        close.push_back(curr.name);
+        std::cout << "Close list: " << close << ";" << std::endl;
+
+        for (auto var : edges[curr.name])
+        {
+            if (close.find(var.first) != std::string::npos || var.second <= 0)
+            {
+                continue; // если вершина находится в списке закрытых или по ней нельзя пустить поток
+            }
+            if (var.first == start) //пропускаем вершины, ведущие в начало
                 continue;
-            }
+            open.insert(Vertex<T>(var.first, curr.path + curr.name, var.second,
+                                    std::min(curr.flow_for_path, var.second)));
+
+            std::cout << "Edge {" << curr.path + curr.name << "->" << var.first <<
+                        "; " << var.second << "; " << std::min(curr.flow_for_path, var.second) <<
+                        "} add to open list" << std::endl;
         }
-        char next = max_neighbors_flow(point[curr].neighbors, neighbors_list);
-        cout << "Next vertex '" << next << "'" << endl;
-
-        point[next].mark = {std::min(point[curr][next].first, point[curr].mark.first), curr};
-        point[next].markFlag = true;
-        //cout << "Next vertex: " << next << "; mark[" << point[next].mark.first << "/" << point[next].neighbors[next] << "]" << endl;
-        curr = next;
-
-        if (curr == end)
-        {
-            cout << "We have reached the final peak! Through way:";
-            std::stack<char> out; //стек для промежуточного вывода
-            sum += point[curr].mark.first;
-            flow = point[curr].mark.first;
-            while (curr != start)
-            {
-                out.push(curr);
-                next = curr;
-                point[curr].markFlag = false;
-                curr = point[curr].mark.second;
-                point[curr][next].first -= flow;
-                point[curr][next].second += flow;
-            }
-            out.push(start);
-
-            while (!out.empty())
-            {
-                cout << " " << out.top();
-                out.pop();
-            }
-            cout << ". Current flow: " << flow << endl;
-        }
-        neighbors_list.clear();
     }
+    return max_flow;
 }
 
 int main()
 {
-    Graph one;
-    one.init();
-    //one.print_graph();
-    cout << one.searchMaxFlow() << endl;
-    one.print_for_stepik();
-    //one.print_graph();
+    Graph<char> graph;
+    graph.init();
+    std::cout << graph.ff_alg() << std::endl;
+    graph.print();
 
     return 0;
 }
