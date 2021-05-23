@@ -1,0 +1,5 @@
+Cсылка на онлайн компиллятор: https://replit.com/@kruglova9382/lab4#lab4/main.cpp
+Для запуска g++ main.cpp
+с консоли ./a.out 
+Из файла ./a.out < ./test/1.txt
+
