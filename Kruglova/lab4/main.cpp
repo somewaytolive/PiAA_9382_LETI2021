@@ -33,19 +33,40 @@ FullString::FullString()
 void FullString::fill_pf()
 //заполняем массив значений префиксной функции
 {
+    std::cout << "Fill pref. fun" << std::endl;
     pf[0] = 0;
+    std::cout << "Curr elem is '" << pattern[0] << "', pf = " << pf[0] 
+                << std::endl;
 
     for (int k = 0, i = 1; i < pattern.length(); ++i)
     //заполняем pf
     {
+        std::cout << "Curr elem is '" << pattern[i] << "'.";
+
         while (k > 0 && pattern[i] != pattern[k])
+        {
             k = pf[k-1];
+            std::cout << " pattern[i] (" << pattern[i] << ") != pattern[k] ("
+                        << pattern[k] << "), => k = pf[k-1].";
+            if (k == 0)
+                std::cout << " No identical items found => k = 0.";
+        }
 
         if (pattern[i] == pattern[k])
+        {
+            std::cout << " pattern[i] (" << pattern[i] << ") == pattern[k] ("
+                        << pattern[k] << "), => k++.";
             k++;
+        }
 
         pf[i] = k;
+        std::cout << " Pref. fun = " << pf[i] << std::endl;
     }
+    std::cout << "Pattern - " << pattern << std::endl;
+    std::cout << "Pref.fun- ";
+    for (auto var : pf)
+        std::cout << var;
+    std::cout << std::endl;
 }
 
 vector<int> FullString::KMP_search()
