@@ -38,49 +38,55 @@ public:
     std::vector<std::string> getPatterns() { return patterns; }
 };
 
-using namespace std;
-
 class TreeNode {
+private:
+    std::string dbgStr = ""; // Для отладки
+    char value; // Значение ноды
+    size_t numOfPattern = 0; // Номер введенного паттерна
+    TreeNode *parent = nullptr; // Родитель ноды
+    TreeNode *suffixLink = nullptr; // Суффиксная ссылка
+    std::unordered_map <char, TreeNode*> children; // Потомок ноды
+
 public:
     explicit TreeNode(char val) : value(val) {} // Конструктор ноды
 
     // Отладочная функция для печати бора
     void printTrie() {
-        cout << "Бор сейчас:" << endl;
+        std::cout << "Бор сейчас:" << std::endl;
 
-        queue<TreeNode *> queue;
+        std::queue<TreeNode *> queue;
         queue.push(this);
 
         while (!queue.empty()) {
             auto curr = queue.front();
             if (!curr->value)
-                cout << "Корень:" << endl;
+                std::cout << "Корень:" << std::endl;
             else
-                cout << curr->dbgStr << ':' << endl;
+                std::cout << curr->dbgStr << ':' << std::endl;
 
             if (curr->suffixLink)
-                cout << "\tСуффиксная ссылка: " << (curr->suffixLink == this ? "Root" : curr->suffixLink->dbgStr) << endl;
+                std::cout << "\tСуффиксная ссылка: " << (curr->suffixLink == this ? "Root" : curr->suffixLink->dbgStr) << std::endl;
 
             if (curr->parent && curr->parent->value)
-                cout << "\tРодитель: " << curr->parent->dbgStr << endl;
+                std::cout << "\tРодитель: " << curr->parent->dbgStr << std::endl;
             else if (curr->parent)
-                cout << "\tРодитель: Корень" << endl;
+                std::cout << "\tРодитель: Корень" << std::endl;
 
-            if (!curr->children.empty()) cout << "\tПотомок: ";
+            if (!curr->children.empty()) std::cout << "\tПотомок: ";
             for (auto child : curr->children) {
-                cout << child.second->value << ' ';
+                std::cout << child.second->value << ' ';
                 queue.push(child.second);
             }
 
             queue.pop();
-            cout << endl;
+            std::cout << std::endl;
         }
-        cout << endl;
+        std::cout << std::endl;
 
     }
 
     // Вставка подстроки в бор
-    void insert(const string &str) {
+    void insert(const std::string &str) {
         auto curr = this;
         static size_t countPatterns = 0;
 
@@ -98,8 +104,8 @@ public:
 
         if (d_flag)
         {
-        cout << "Вставляем строку: " << str << endl;
-        printTrie();
+            std::cout << "Вставляем строку: " << str << std::endl;
+            printTrie();
         }
 
         // Показатель терминальной вершины, значение которого равно порядковому номеру добавления шаблона
@@ -107,12 +113,12 @@ public:
     }
 
     // Функция для поиска подстроки в строке при помощи автомата
-    vector<size_t> find(const char c) {
+    std::vector<size_t> find(const char c) {
         static const TreeNode *curr = this; // Вершина, с которой необходимо начать следующий вызов
-        string str; //для вывода найденного шаблона
+        std::string str; //для вывода найденного шаблона
         if (d_flag) 
         {
-            cout << "Ищем '" << c << "' из: " << (curr->dbgStr.empty() ? "Корень" : curr->dbgStr) << endl; // Дебаг
+            std::cout << "Ищем '" << c << "' из: " << (curr->dbgStr.empty() ? "Корень" : curr->dbgStr) << std::endl; // Дебаг
             str = curr->dbgStr;
         }
 
@@ -122,13 +128,13 @@ public:
             for (auto child : curr->children)
                 if (child.first == c) { // Если символ потомка равен искомому
                     curr = child.second; // Значение текущей вершины переносим на этого потомка
-                    vector<size_t> found; // Вектор номеров найденных терм. вершин
+                    std::vector<size_t> found; // Вектор номеров найденных терм. вершин
 
-                    if (d_flag) cout << "Символ '" << c << "' найден!" << endl; // Дебаг
+                    if (d_flag) std::cout << "Символ '" << c << "' найден!" << std::endl; // Дебаг
                     if (curr->numOfPattern) { // Для пропуска пересечений, после нахождения терминальной вершины
                         if (d_flag)
                         {
-                            cout << "Найден шаблон: " << str << c << endl;
+                            std::cout << "Найден шаблон: " << str << c << std::endl;
                         }
                         found.push_back(curr->numOfPattern - 1); // Добавляем к найденным эту вершину
                         curr = this; // И переходим в корень
@@ -137,11 +143,11 @@ public:
                 }
 
             if (d_flag && curr->suffixLink) {
-                cout << "Переходим по суффиксной ссылке: ";
-                cout << (curr->suffixLink->dbgStr.empty() ? "Корень" : curr->suffixLink->dbgStr) << endl;
+                std::cout << "Переходим по суффиксной ссылке: ";
+                std::cout << (curr->suffixLink->dbgStr.empty() ? "Корень" : curr->suffixLink->dbgStr) << std::endl;
             }
         }
-        if (d_flag) cout << "Символ '" << c << "' не найден!" << endl; // Дебаг
+        if (d_flag) std::cout << "Символ '" << c << "' не найден!" << std::endl; // Дебаг
 
         curr = this;
         return {};
@@ -149,9 +155,9 @@ public:
 
     // Функция для построения недетерминированного автомата
     void makeAutomaton() {
-        if (d_flag) cout << "Строим автомат: " << endl;
+        if (d_flag) std::cout << "Строим автомат: " << std::endl;
 
-        queue<TreeNode *> queue; // Очередь для обхода в ширину
+        std::queue<TreeNode *> queue; // Очередь для обхода в ширину
 
         for (auto child : children) // Заполняем очередь потомками корня
             queue.push(child.second);
@@ -161,28 +167,29 @@ public:
 
             // Для дебага
             if (d_flag) {
-            cout << curr->dbgStr << ':' << endl;
-            if (curr->parent && curr->parent->value)
-                cout << "\tРодитель: " << curr->parent->dbgStr << endl;
-            else if (curr->parent)
-                cout << "\tРодитель: Корень" << endl;
+                std::cout << curr->dbgStr << ':' << std::endl;
+                if (curr->parent && curr->parent->value)
+                    std::cout << "\tРодитель: " << curr->parent->dbgStr << std::endl;
+                else if (curr->parent)
+                    std::cout << "\tРодитель: Корень" << std::endl;
 
-            if (!curr->children.empty())
-                cout << "\tПотомок: ";
+                if (!curr->children.empty())
+                    std::cout << "\tПотомок: ";
             }
-            //
 
             // Заполняем очередь потомками текущей верхушки
             for (auto child : curr->children) {
-                if (d_flag) cout << child.second->value << ' '; // Дебаг
+                if (d_flag) 
+                    std::cout << child.second->value << ' '; // Дебаг
+                
                 queue.push(child.second);
             }
 
             // Дебаг
             if (d_flag)
             {
-            if (!curr->children.empty())
-                cout << endl;
+                if (!curr->children.empty())
+                    std::cout << std::endl;
             }
 
             queue.pop();
@@ -199,46 +206,41 @@ public:
             // в дереве по символу текущей вершины, иначе равна найденной вершине
             curr->suffixLink = p ? p->children[x] : this;
             // Дебаг
-            if (d_flag) cout << "\tСуффиксная ссылка: " << (curr->suffixLink == this ? "Корень" : curr->suffixLink->dbgStr) << endl << endl;
+            if (d_flag) 
+                std::cout << "\tСуффиксная ссылка: " << 
+                    (curr->suffixLink == this ? "Корень" : curr->suffixLink->dbgStr)
+                    << std::endl << std::endl;
         }
 
         // Дебаг
         if (d_flag)
         {
-        cout << endl;
-        printTrie();
+            std::cout << std::endl;
+            printTrie();
         }
     }
 
     ~TreeNode() { // Деструктор ноды
         for (auto child : children) delete child.second;
     }
-
-private:
-    string dbgStr = ""; // Для отладки
-    char value; // Значение ноды
-    size_t numOfPattern = 0; // Номер введенного паттерна
-    TreeNode *parent = nullptr; // Родитель ноды
-    TreeNode *suffixLink = nullptr; // Суффиксная ссылка
-    unordered_map <char, TreeNode*> children; // Потомок ноды
 };
 
 class Trie {
 public:
     Trie() : root('\0') {} // Конструктор бора
 
-    void insert(const string &str) { root.insert(str); }
-    vector<size_t> find(const char c) { return root.find(c); }
+    void insert(const std::string &str) { root.insert(str); }
+    std::vector<size_t> find(const char c) { return root.find(c); }
     void makeAutomaton() { root.makeAutomaton(); }
 
 private:
     TreeNode root; // Корень бора
 };
 
-set <pair<size_t, size_t>> AhoCorasick(const string &text, const vector <string> &patterns)
+std::set <std::pair<size_t, size_t>> AhoCorasick(const std::string &text, const std::vector <std::string> &patterns)
 {
     Trie bor;
-    set <pair<size_t, size_t>> result;
+    std::set <std::pair<size_t, size_t>> result;
 
     for (const auto &pattern : patterns) // Заполняем бор введенными паттернами
         bor.insert(pattern);
@@ -264,7 +266,7 @@ int main(int argc, char** argv)
 
     auto res = AhoCorasick(D.getText(), D.getPatterns());
     for (auto r : res)
-        cout << r.first << ' ' << r.second << endl;
+        std::cout << r.first << ' ' << r.second << std::endl;
 
     //system("pause");
 
